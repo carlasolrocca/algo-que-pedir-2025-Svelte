@@ -1,10 +1,12 @@
 <script lang='ts'>
-  import { goto } from '$app/navigation'
+  import { invalidate } from '$app/navigation'
   import Tabla from '$lib/components/generales/tabla/Tabla.svelte'
   import Boton from '$lib/components/generales/boton/boton.svelte'
-  import { INGREDIENTES_MOCK } from '$lib/data/mocks/ingredientesMock'
   import IconoBoton from '$lib/components/generales/icono boton/iconoBoton.svelte'
   import IngredienteRow from '$lib/components/ingredientes/IngredienteRow.svelte'
+  import { Ingrediente } from '$lib/models/ingrediente.svelte'
+  import { ingredientesService } from '$lib/services/ingredienteService'
+  import { showToast } from '$lib/toasts/toasts'
 
   import eye from '$lib/assets/eye.svg'
   import trash from '$lib/assets/trash.svg'
@@ -12,25 +14,43 @@
   
   import Modal from '$lib/components/modales/Modal.svelte'
   import IngredientesForm from '$lib/components/editar-ingredientes/IngredientesForm.svelte'
+  import { showError } from '$lib/utils/errorHandler.js'
 
-  let modalOpen = false
-  let ingredienteId: string | null = null
+  let { data } = $props()
+  let ingredientes = $derived(data.ingredientes)
+
+  let modalOpen = $state(false)
+  let selectedIngrediente: Ingrediente | null = $state(null)
+  let nuevoIngrediente = $state(false)
 
   const abrirNuevo = () => {
-    ingredienteId = null
+    selectedIngrediente = new Ingrediente()
+    nuevoIngrediente = true
     modalOpen = true
   }
 
-  const abrirEditar = (id: string) => {
-    ingredienteId = id
+  const abrirEditar = (ingrediente: Ingrediente) => {
+    selectedIngrediente = ingrediente
+    nuevoIngrediente = false
     modalOpen = true
   }
 
-  const cerrarModal = () => {
+  const cerrarModal = async () => {
     modalOpen = false
+    selectedIngrediente = null
+    await invalidate('ingredientes:list')
   }
 
-  const editar = (id: string) => { abrirEditar(id)}
+  const eliminarIngrediente = async (ingrediente: Ingrediente) => {
+    try {
+      await ingredientesService.eliminarIngrediente(ingrediente.id!)
+      showToast('Ingrediente eliminado con éxito', 'success')
+      await invalidate('ingredientes:list')
+    } catch (error) {
+      showError('Error al eliminar el ingrediente', error)
+    }
+  } 
+
 </script>
 
 {#snippet nombreColumnas()}
@@ -42,22 +62,22 @@
 {/snippet}
 
 {#snippet datosFilas()}
-  {#each INGREDIENTES_MOCK as ingrediente (ingrediente.id)}
+  {#each ingredientes as ingrediente (ingrediente.id)}
     <IngredienteRow {ingrediente}>
       {#snippet columnasExtra()}
-        <td>{ingrediente.costo}</td>
+        <td>${ingrediente.costo.toFixed(2)}</td>
       {/snippet}
       {#snippet acciones()}
         <div class="iconos-acciones">
           <!-- AGREGAR ACCION PARA EL ICONO BOTON EYE -->
-          <IconoBoton claseIcono="icono-ojo">
+          <IconoBoton claseIcono="icono-ojo" onclick={() => {}}>
             <img src={eye} alt="ojo">
           </IconoBoton>
-          <IconoBoton onclick={() => editar(ingrediente.id)} >
+          <IconoBoton onclick={() => abrirEditar(ingrediente)} >
             <img src={pencil} alt="lapiz">
           </IconoBoton>
           <!-- AGREGAR ACCION PARA EL ICONO BOTON TRASH -->
-          <IconoBoton>
+          <IconoBoton onclick={() => {eliminarIngrediente(ingrediente)}}>
             <img src={trash} alt="tacho">
           </IconoBoton>
         </div>
@@ -66,6 +86,13 @@
   {/each}
 {/snippet}
 
+{#snippet formSnippet()}
+  <IngredientesForm
+    ingrediente={selectedIngrediente!}
+    nuevoIngrediente={nuevoIngrediente}
+    onClose={cerrarModal}
+  />
+{/snippet}
 
 <main class="ingrediente-container main-vista">
     <header class="boton-titulo">
@@ -75,12 +102,13 @@
     <Tabla {nombreColumnas} {datosFilas}/>
 </main> 
 
-<Modal
-  open={modalOpen}
-  onClose={cerrarModal}
-  componente={IngredientesForm}
-  props={{ ingredienteId }}
-/>
+{#if selectedIngrediente}
+  <Modal
+    open={modalOpen}
+    onClose={cerrarModal}
+    content={formSnippet}
+  />
+{/if}
 
 
 <style>
