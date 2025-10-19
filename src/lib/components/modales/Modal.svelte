@@ -29,17 +29,13 @@
     }
   })
 
-  const handleModalKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      onClose()
-    }
-  }
-
 </script>
 
 {#if open}
-  <div class="overlay" onclick={() => onClose()} role="button" tabindex="0" onkeydown={handleModalKeyDown}>
-      <div class="modal" onclick={(event) => event.stopPropagation()} role="button" tabindex="0" onkeydown={(event) => event.stopPropagation()}>
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="overlay" onclick={() => onClose()}>
+      <div class="modal" onclick={(event) => event.stopPropagation()}>
       <button class="close-btn" onclick={onClose}>Cerrar</button>
 
       {#if content}
