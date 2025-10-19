@@ -9,20 +9,20 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    outline: none;
+    padding: 2rem; /* Add padding to the overlay */
+    box-sizing: border-box;
 }
 
 .modal {
     position: relative;
     background: white;
-    padding: 2rem;
+    padding: 2.5rem; /* Keep the internal padding for the content */
     border-radius: 0.5rem;
-    min-width: 500px;
-    max-width: 1200px;
-    width: 80%;
-    max-height: 95%;
-    overflow-y: auto;
+    width: 100%; /* Fill the padded overlay area */
+    height: 100%; /* Fill the padded overlay area */
+    overflow-y: auto; /* Only scroll if content is too long */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 }
 
 .close-btn {
@@ -31,34 +31,14 @@
     right: 0.5rem;
     background: transparent;
     border: none;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     cursor: pointer;
+    line-height: 1;
 }
 
 .close-btn:hover {
     color: #e74c3c;
 }
 
-@media (width <=400px) {
-
-  .modal {
-    width: 50%;
-    padding: 1rem;
-    max-height: 95%;
-  }
-
-  .modal form {
-    gap: 0.75rem;
-  }
-
-  .modal .button {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .close-btn {
-    font-size: 1.5rem;
-    top: 0.25rem;
-    right: 0.25rem;
-  }
-}
+/* No media queries needed for positioning anymore! */
+/* We can add them back later if we want to change the padding on different screen sizes */
