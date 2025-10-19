@@ -1,26 +1,23 @@
 <script lang="ts">
-  export let ingredienteId: string | null = null
-  export let onClose: () => void
-
-  import './ingredientes-form.css'
+  import { Ingrediente } from '$lib/models/ingrediente.svelte'
   import { GrupoAlimenticio } from '$lib/models/ingrediente.svelte'
   import Boton from '../generales/boton/boton.svelte'
   import Input from '$lib/components/generales/input/input.svelte'
   import Switch from '$lib/components/generales/switch/switch.svelte'
   import Textarea from '$lib/components/generales/input/textarea.svelte'
-  import { INGREDIENTES_MOCK } from '$lib/data/mocks/ingredientesMock'
-
+  import Validador from '$lib/utils/validador.svelte'
   import { showToast } from '$lib/toasts/toasts'
-  
-  
-  //Variables del formulario que en caso de edición
-  //deberían llenarse con los datos del ingrediente que se está editando
-  // TODO: no funciona con el Switch porque no está declarado como bindeable.
 
-  let nombre = ''
-  let costo = 0
-  let grupoAlimenticio = ''
-  let origen: 'animal' | 'vegetal' = 'vegetal'
+  import './ingredientes-form.css'
+  import { ingredientesService } from '$lib/services/ingredienteService'
+  import { showError } from '$lib/utils/errorHandler'
+  interface Props {
+    ingrediente: Ingrediente
+    onClose: () => void
+    nuevoIngrediente: boolean
+  }
+
+  let { ingrediente, onClose, nuevoIngrediente }: Props = $props()
 
   const grupoOptions = [
     { value: GrupoAlimenticio.CEREALES_Y_TUBERCULOS, label: 'Cereales y tubérculos' },
@@ -31,69 +28,79 @@
     { value: GrupoAlimenticio.PROTEINAS, label: 'Proteínas' }
   ]
 
-  $: if (ingredienteId) {
-    const ingrediente = INGREDIENTES_MOCK.find(i => i.id === +ingredienteId)
-    if (ingrediente) {
-      nombre = ingrediente.nombre
-      costo = +ingrediente.costo
-      grupoAlimenticio = ingrediente.grupo
-      origen = ingrediente.origen
+  const guardarCambios = async () => {
+    try {
+      ingrediente.validarIngrediente()
+      if(!ingrediente.invalid()){
+        if(nuevoIngrediente){
+          await ingredientesService.crearIngrediente(ingrediente)
+          showToast('Ingrediente creado con éxito', 'success')
+        } else {
+          await ingredientesService.actualizarIngrediente(ingrediente)
+          showToast('Ingrediente actualizado con éxito', 'success')
+        }
+      }
+      onClose()
+    } catch (error) {
+      showError('Error al actualizar el ingrediente', error)
     }
   }
 
-  function guardarCambios() {
-    //alert('Ingredientes guardados')
-    showToast('Cambios guardados','success',3000)
+  const descartarCambios = () => {
     onClose()
   }
 
-  function descartarCambios() {
-    showToast('Cambios descartados :(','error',3000)
-    onClose()
-  }
-
+  const titulo = nuevoIngrediente ? 'Nuevo Ingrediente' : 'Editar Ingrediente'
 </script>
 
 <main class="vista-edicion-ingrediente main-vista">
-  <h1 class="titulo-edicion">
-    {ingredienteId ? `Editar ingrediente ${ingredienteId}` : 'Nuevo ingrediente'}
-  </h1>
+  <h1 class="titulo-edicion">{titulo}</h1>
 
   <section class="container-edicion contenedor-general">
     <article class="item-input-edicion">
       <form>
         <Input
-          nombre_label="Nombre del ingrediente*"
+          nombre_label="Nombre del ingrediente"
           type="text"
-          bind:value={nombre}
+          bind:value={ingrediente.nombre}
           id="nombre-ingrediente"
           placeholder="Ingresa el nombre del ingrediente..."
           required={true}
         />
+        <Validador elemento={ingrediente} atributo="nombre" />
 
         <Input
-          nombre_label="Costo*"
+          nombre_label="Costo"
           type="number"
-          bind:value={costo}
+          bind:value={ingrediente.costo}
           id="costo-ingrediente"
           placeholder="Ingresa su costo..."
           required={true}
         />
+        <Validador elemento={ingrediente} atributo="costo" />
 
         <Textarea
           nombre_label="Grupo Alimenticio"
-          bind:value={grupoAlimenticio}
+          bind:value={ingrediente.grupo}
           id="grupo-alimenticio"
           select={true}
-          options={grupoOptions}
+          options={[{ value: '', label: 'Selecciona una opción' }, ...grupoOptions]}
         />
+        <Validador elemento={ingrediente} atributo="grupo" />
 
-        <Switch id="origen-toggle" bind:checked={origen} titulo="Origen animal" />
-
+        <article class="origen-toggle">
+          <Switch
+            id="origen-toggle"
+            titulo="Origen animal"
+            bind:checked={ingrediente.esAnimal}
+          />
+        </article>
       </form>
-      <div class="button">
-        <Boton tipo="primario" onclick={guardarCambios}>Guardar Cambios</Boton>
-        <Boton tipo="secundario" onclick={descartarCambios}>Descartar Cambios</Boton>
+      <div class="container-botones-edicion">
+        <Boton tipo="primario" data-testid="btnGuardar" class="boton-primario boton-guardar"
+        onclick={guardarCambios}>Guardar Cambios</Boton>
+        <Boton tipo="secundario" data-testid="btnDescartar" class="boton-secundario boton-descartar" 
+        onclick={descartarCambios}>Descartar Cambios</Boton>
       </div>
     </article>
   </section>
