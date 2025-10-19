@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
+  import type { Snippet } from 'svelte'
 
-  export let open: boolean
-  export let onClose: () => void
-  export let componente: any = null
-  export let props: any = {}
+  let { open, onClose, content}: {
+    open: boolean
+    onClose: () => void
+    content?: Snippet
+  } = $props()
 
   import './modal.css'
 
@@ -27,15 +29,21 @@
     }
   })
 
+  const handleModalKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onClose()
+    }
+  }
+
 </script>
 
 {#if open}
-  <div class="overlay" on:click={() => onClose()}>
-    <div class="modal" on:click|stopPropagation>
-      <button class="close-btn" on:click={onClose}>Cerrar</button>
+  <div class="overlay" onclick={() => onClose()} role="button" tabindex="0" onkeydown={handleModalKeyDown}>
+      <div class="modal" onclick={(event) => event.stopPropagation()} role="button" tabindex="0" onkeydown={(event) => event.stopPropagation()}>
+      <button class="close-btn" onclick={onClose}>Cerrar</button>
 
-      {#if componente}
-        <svelte:component this={componente} {...props} />
+      {#if content}
+        {@render content()}
       {/if}
     </div>
   </div>
