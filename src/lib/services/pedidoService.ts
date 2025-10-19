@@ -1,4 +1,4 @@
-import { Pedido } from '$lib/models/pedido.svelte.ts'
+import type { Pedido } from '$lib/types'
 import { PEDIDOS_MOCK } from '$lib/data/mocks/pedidosMock'
 import { error } from '@sveltejs/kit'
 

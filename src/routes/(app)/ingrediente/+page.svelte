@@ -54,7 +54,7 @@
       {#snippet acciones()}
         <div class="iconos-acciones">
           <!-- AGREGAR ACCION PARA EL ICONO BOTON EYE -->
-          <IconoBoton data-testid={'ver-'+ingrediente.id}>
+          <IconoBoton data-testid={'ver-'+ingrediente.id} onclick={() => {}}>
             <img src={eye} alt="ojo" class="icono-ojo">
           </IconoBoton>
           <IconoBoton onclick={() => editar(ingrediente)} data-testid={'editar-'+ingrediente.id}>
