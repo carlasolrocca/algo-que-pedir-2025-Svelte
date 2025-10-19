@@ -18,7 +18,7 @@ type IngredienteRowProps = SvelteHTMLElements['tr'] & {
 let { ingrediente, columnasExtra, acciones, ...trAtributos }: IngredienteRowProps = $props()
 
 const mapaIconos = {vegetal: palta, animal: cow }
-const iconoOrigen = mapaIconos[ingrediente.origen]
+const iconoOrigen = $derived(mapaIconos[ingrediente.origen])
 </script>
 
 <tr {...trAtributos}>
@@ -38,7 +38,7 @@ const iconoOrigen = mapaIconos[ingrediente.origen]
     </td>  
   {:else} <!-- sino por defecto dejamos el tacho -->
     <td class="icono-accion">
-      <IconoBoton> <!-- Acá debería la función para borrar ingrediente de la LISTA de PLATOS -->
+      <IconoBoton onclick={() => {}}> <!-- Acá debería la función para borrar ingrediente de la LISTA de PLATOS -->
         <img src={trash} alt="eliminar">
       </IconoBoton>
     </td>
