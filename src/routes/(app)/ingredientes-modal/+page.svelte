@@ -86,13 +86,6 @@
   {/each}
 {/snippet}
 
-{#snippet formSnippet()}
-  <IngredientesForm
-    ingrediente={selectedIngrediente!}
-    nuevoIngrediente={nuevoIngrediente}
-    onClose={cerrarModal}
-  />
-{/snippet}
 
 <main class="ingrediente-container main-vista">
     <header class="boton-titulo">
@@ -106,8 +99,11 @@
   <Modal
     open={modalOpen}
     onClose={cerrarModal}
-    content={formSnippet}
-  />
+  ><IngredientesForm
+    ingrediente={selectedIngrediente!}
+    nuevoIngrediente={nuevoIngrediente}
+    onClose={cerrarModal}
+  /></Modal>
 {/if}
 
 

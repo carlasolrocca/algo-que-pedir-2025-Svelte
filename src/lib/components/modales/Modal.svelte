@@ -1,11 +1,11 @@
-<script lang="ts">
+<script lang="ts"> 
   import { onMount, onDestroy } from 'svelte'
   import type { Snippet } from 'svelte'
 
-  let { open, onClose, content}: {
+  let { open, onClose, children}: {
     open: boolean
     onClose: () => void
-    content?: Snippet
+    children?: Snippet
   } = $props()
 
   import './modal.css'
@@ -38,8 +38,8 @@
       <div class="modal" onclick={(event) => event.stopPropagation()}>
       <button class="close-btn" onclick={onClose}>Cerrar</button>
 
-      {#if content}
-        {@render content()}
+      {#if children}
+        {@render children()}
       {/if}
     </div>
   </div>

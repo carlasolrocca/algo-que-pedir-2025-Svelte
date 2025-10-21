@@ -11,6 +11,7 @@
   import './ingredientes-form.css'
   import { ingredientesService } from '$lib/services/ingredienteService'
   import { showError } from '$lib/utils/errorHandler'
+  import { invalidate } from '$app/navigation'
   interface Props {
     ingrediente: Ingrediente
     onClose: () => void
@@ -40,7 +41,7 @@
           showToast('Ingrediente actualizado con éxito', 'success')
         }
       }
-      onClose()
+      await invalidate('ingredients:list')
     } catch (error) {
       showError('Error al actualizar el ingrediente', error)
     }

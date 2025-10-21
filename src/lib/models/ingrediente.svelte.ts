@@ -11,7 +11,7 @@ export class Ingrediente {
   static fromJson(ingredienteJSON: IngredienteJSON): Ingrediente {
     return Object.assign(new Ingrediente(), ingredienteJSON, {
       origen: ingredienteJSON.origenAnimal ? 'animal' : 'vegetal',
-      grupo: mapGrupo(ingredienteJSON.grupo) 
+      grupo: mapGrupo(ingredienteJSON.grupoAlimenticio) 
     })
   }
   
@@ -60,8 +60,8 @@ export class Ingrediente {
     return {
       id: this.id ?? undefined,
       nombre: this.nombre,
-      costo: this.costo,
-      grupo: grupoToEnum(this.grupo),
+      costoMercado: this.costo,
+      grupoAlimenticio: grupoToEnum(this.grupo),
       origenAnimal: this.esAnimal
     }
   }
@@ -81,8 +81,8 @@ export enum GrupoAlimenticio {
 export type IngredienteJSON = {
   id?: number,
   nombre: string,
-  costo: number,
-  grupo: string,
+  costoMercado: number,
+  grupoAlimenticio: string,
   origenAnimal: boolean
 }
 
