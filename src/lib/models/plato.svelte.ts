@@ -9,7 +9,7 @@ export class Plato {
   imagenUrl = $state<string>('')    // Lo dejo vacio, viene del back la imagen respectiva, e incluso la imagen vacia para ponerle a un plato nuevo
   valorBase = $state<number>(0)
   esDeAutor = $state(false)
-  esNuevo = $state(false)
+  esNuevo = $state(true)
   porcentajeDescuento = $state<number>(0)
   costoProduccion = $state<number>(0)
   ingredientes: Ingrediente[] = $state([])
